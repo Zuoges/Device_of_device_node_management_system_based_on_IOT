@@ -58,6 +58,7 @@ esp_err_t wifi_event_handler(void* arg, esp_event_base_t event_base,int32_t even
                 ESP_LOGI(TAG, "SYSTEM_EVENT_STA_DISCONNECTED");
                 if(wifi_connected_bit == 1)
                 {
+                    mqtt_uinit();
                     Device_Event_uninit();
                     printf("wifi disconnect , all task uninit\n");
                 }

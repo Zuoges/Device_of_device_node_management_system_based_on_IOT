@@ -103,10 +103,18 @@ void server_data_build(char *TX)
     cJSON_AddItemToObject(root, "powerfactor", cJSON_CreateNumber(im1281b_data->power_factor));
     cJSON_AddItemToObject(root, "analysis", cJSON_CreateString(elecapp_state));
 
-    sprintf(TX, "%s", cJSON_Print(root));
+    char* pstr = cJSON_Print(root);
+
+    sprintf(TX, "%s", pstr);
+    free(pstr);
     printf("package ok \r\n");
+    // if(next)
+    //     cJSON_Delete(next);
     if(root)
+    {
+        //cJSON_Delete(next);
         cJSON_Delete(root);
+    }
 }
 
 void analysis_data_build(char* data)

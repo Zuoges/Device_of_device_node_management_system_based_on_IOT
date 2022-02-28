@@ -13,7 +13,7 @@ void app_main(void)
     gpio_init();
     key_init();
     im1281b_init();
-    //wifi_init();   
+    wifi_init();   
     lvgl_init();
     Device_Event_init();
     euclidean_data_init();

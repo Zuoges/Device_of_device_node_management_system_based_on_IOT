@@ -38,6 +38,7 @@ void Device_main_task()
     static int free_bit = 1;
     static int reservation_bit = 0;
     static int using_bit = 0;
+    static int mqtt_count = 0;
     while(1)
     {
         //lv_label_set_text(lvgl_gui->all_label_notice , http_rec.control);
@@ -53,12 +54,19 @@ void Device_main_task()
         lv_chart_set_next(lvgl_gui->user_tabview_tab2_chart_power , lvgl_gui->user_tabview_tab2_chart_series_power , im1281b_data->power);
         
         // printf("U: %.4f\nI: %.4f\nP: %.4f\nPF: %.4f\nE: %.4f\n\n" , im1281b_data->voltage , im1281b_data->current , im1281b_data->power , im1281b_data->power_factor , im1281b_data->electricity);
-        printf("%.4f, %.4f, %.4f, %.4f, %.4f, \n" , im1281b_data->voltage , im1281b_data->current , im1281b_data->power , im1281b_data->power_factor , im1281b_data->electricity);
+        //printf("%.4f, %.4f, %.4f, %.4f, %.4f, \n" , im1281b_data->voltage , im1281b_data->current , im1281b_data->power , im1281b_data->power_factor , im1281b_data->electricity);
 
         status_parse(im1281b_data);
         lv_label_set_text(lvgl_gui->user_tabview_tab3_label_username_value , soldering_state);
         lv_label_set_text(lvgl_gui->user_tabview_tab3_label_ID_value , elecapp_state);
-        // Device_MQTT_send();
+        mqtt_count++;
+        if(mqtt_count >= 5)
+        {
+            Device_MQTT_send();
+            printf("     esp_get_free_heap_size : %d  \n", esp_get_free_heap_size());
+            mqtt_count = 0;
+        }
+        
 
         //lv_label_set_text(lvgl_gui->user_tabview_tab3_label_username_value , http_rec.state_user);
         vTaskDelay(200 / portTICK_PERIOD_MS);

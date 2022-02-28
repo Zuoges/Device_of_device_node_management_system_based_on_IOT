@@ -28,6 +28,7 @@ void mqtt_send_message(char *my_mqtt_topic , char *my_mqtt_data , int message_qo
 esp_err_t mqtt_event_handler(esp_mqtt_event_handle_t event);
 void mqtt_app_start();
 void mqtt_init();
+void mqtt_uinit();
 
 
 #endif /* _MQTT_H_ */

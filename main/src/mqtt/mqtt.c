@@ -28,6 +28,8 @@ char mqtt_json_receive_data[200] = {'\0'};
 
 unsigned char MQTT_REC_BIT = 0;
 
+
+
 void mqtt_subscribe(char *my_mqtt_topic)        //MQTT订阅主题
 {
     int msg_id;
@@ -105,7 +107,6 @@ esp_err_t mqtt_event_handler(esp_mqtt_event_handle_t event)
 void mqtt_app_start()
 {
     mqtt_event_group = xEventGroupCreate();
-
     esp_mqtt_client_config_t mqtt_cfg = {
         .host = MQTT_SERVER_IP,            //MQTT服务器IP
         .event_handle = mqtt_event_handler, //MQTT事件
@@ -131,4 +132,9 @@ void mqtt_init()
     mqtt_app_start();
     mqtt_subscribe(MQTT_RECEIVE_ADDRESS);
     mqtt_subscribe(MQTT_PUBLISH_ADDRESS);
+}
+
+void mqtt_uinit()
+{
+    esp_mqtt_client_stop(client);
 }

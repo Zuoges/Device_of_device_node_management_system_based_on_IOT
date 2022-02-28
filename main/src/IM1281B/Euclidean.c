@@ -127,7 +127,7 @@ void status_parse(im1281b_data_t *data)
             for(i = 0 ; i < ELECAPP_NUM ; i++)
             {
                 d[SOLDERING_up][i] = sqrt( (data->current - elecapp[soldering_state_bit][i][CURRENT])*(data->current - elecapp[soldering_state_bit][i][CURRENT]) + (data->power_factor - elecapp[soldering_state_bit][i][POWERFACTOR])*(data->power_factor - elecapp[soldering_state_bit][i][POWERFACTOR]) + (data->power - elecapp[soldering_state_bit][i][APOWER])*(data->power - elecapp[soldering_state_bit][i][APOWER]) );
-                printf("d[up][%d]= %.4f\n" , i , d[SOLDERING_up][i]);
+                //printf("d[up][%d]= %.4f\n" , i , d[SOLDERING_up][i]);
             }   
             min_i = 0;
             min_d = d[SOLDERING_up][min_i];
@@ -139,7 +139,7 @@ void status_parse(im1281b_data_t *data)
                     min_d = d[SOLDERING_up][min_i];
                 }
             }
-            printf("min_d[up][%d]= %.4f\n" , min_i , min_d);  
+            //printf("min_d[up][%d]= %.4f\n" , min_i , min_d);  
         }   
     }
     else if(soldering_state_bit == SOLDERING_steady)
@@ -149,7 +149,7 @@ void status_parse(im1281b_data_t *data)
             dd[down_num][CURRENT] = data->current;
             dd[down_num][APOWER] = data->power;
             dd[down_num][POWERFACTOR] = data->power_factor;
-            printf("dd[%d]\ndd=%d\n" , down_num , down_down);
+            //printf("dd[%d]\ndd=%d\n" , down_num , down_down);
             down_num++;
             
             if(down_num >= 4 && down_down == 0)
@@ -166,8 +166,8 @@ void status_parse(im1281b_data_t *data)
                         min_p = dd[j][APOWER];
                     }    
                 }
-                printf("min_p[%d]= %.4f\n" , min_j , min_p);
-                printf("minI:%.4fP:%.4fPF:%.4f\n",dd[min_j][CURRENT],dd[min_j][APOWER],dd[min_j][POWERFACTOR]);
+                //printf("min_p[%d]= %.4f\n" , min_j , min_p);
+                //printf("minI:%.4fP:%.4fPF:%.4f\n",dd[min_j][CURRENT],dd[min_j][APOWER],dd[min_j][POWERFACTOR]);
             }
             
             if(down_down == 1)
@@ -175,7 +175,7 @@ void status_parse(im1281b_data_t *data)
                 for(i = 0 ; i < ELECAPP_NUM ; i++)
                 {
                     d[SOLDERING_down][i] = sqrt( (dd[min_j][CURRENT] - elecapp[SOLDERING_down][i][CURRENT])*(dd[min_j][CURRENT] - elecapp[SOLDERING_down][i][CURRENT]) + (dd[min_j][POWERFACTOR] - elecapp[SOLDERING_down][i][POWERFACTOR])*(dd[min_j][POWERFACTOR] - elecapp[SOLDERING_down][i][POWERFACTOR]) + (dd[min_j][APOWER] - elecapp[SOLDERING_down][i][APOWER])*(dd[min_j][APOWER] - elecapp[SOLDERING_down][i][APOWER]) );
-                    printf("d[std][%d]= %.4f\n" , i , d[SOLDERING_down][i]);
+                    //printf("d[std][%d]= %.4f\n" , i , d[SOLDERING_down][i]);
                 }   
                 min_i = 0;
                 min_d = d[SOLDERING_down][min_i];
@@ -187,7 +187,7 @@ void status_parse(im1281b_data_t *data)
                         min_d = d[SOLDERING_down][min_i];
                     }
                 }
-                printf("min_d[std][%d]= %.4f\n" , min_i , min_d); 
+                //printf("min_d[std][%d]= %.4f\n" , min_i , min_d); 
                 down_down = 0;
             } 
         }
@@ -197,9 +197,9 @@ void status_parse(im1281b_data_t *data)
         for(i = 0 ; i < ELECAPP_NUM ; i++)
         {
             d[SOLDERING_no][i] = sqrt( (data->current - elecapp[SOLDERING_no][i][CURRENT])*(data->current - elecapp[SOLDERING_no][i][CURRENT]) + (data->power_factor - elecapp[SOLDERING_no][i][POWERFACTOR])*(data->power_factor - elecapp[SOLDERING_no][i][POWERFACTOR]) + (data->power - elecapp[SOLDERING_no][i][APOWER])*(data->power - elecapp[SOLDERING_no][i][APOWER]) );
-            printf("d[no][%d]= %.4f\n" , i , d[SOLDERING_no][i]);
+            //printf("d[no][%d]= %.4f\n" , i , d[SOLDERING_no][i]);
             d[SOLDERING_down][i] = sqrt( (data->current - elecapp[SOLDERING_down][i][CURRENT])*(data->current - elecapp[SOLDERING_down][i][CURRENT]) + (data->power_factor - elecapp[SOLDERING_down][i][POWERFACTOR])*(data->power_factor - elecapp[SOLDERING_down][i][POWERFACTOR]) + (data->power - elecapp[SOLDERING_down][i][APOWER])*(data->power - elecapp[SOLDERING_down][i][APOWER]) );
-            printf("d[down][%d]= %.4f\n" , i , d[SOLDERING_down][i]);
+            //printf("d[down][%d]= %.4f\n" , i , d[SOLDERING_down][i]);
         }  
         min_s = 0;
         min_i = 0;
@@ -228,7 +228,7 @@ void status_parse(im1281b_data_t *data)
         {
             soldering_state_bit = SOLDERING_down;
         }  
-        printf("min_d[%d][%d]= %.4f\n" , min_s , min_i , min_d); 
+        //printf("min_d[%d][%d]= %.4f\n" , min_s , min_i , min_d); 
     }
     switch(min_i)
     {
