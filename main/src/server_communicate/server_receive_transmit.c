@@ -101,7 +101,12 @@ void server_data_build(char *TX)
     cJSON_AddItemToObject(root, "apower", cJSON_CreateNumber(im1281b_data->power));
     cJSON_AddItemToObject(root, "aelectricity", cJSON_CreateNumber(im1281b_data->electricity));
     cJSON_AddItemToObject(root, "powerfactor", cJSON_CreateNumber(im1281b_data->power_factor));
-    cJSON_AddItemToObject(root, "analysis", cJSON_CreateString(elecapp_state));
+    //cJSON_AddItemToObject(root, "analysis", cJSON_CreateString(elecapp_state));
+    cJSON_AddItemToObject(root, "analysis", next);
+    cJSON_AddItemToObject(next, "charger", cJSON_CreateNumber(charger_state_bit));
+    cJSON_AddItemToObject(next, "lamp", cJSON_CreateNumber(lamp_state_bit));
+    cJSON_AddItemToObject(next, "soldering", cJSON_CreateNumber(soldering_state_bit));
+    cJSON_AddItemToObject(next, "unknown", cJSON_CreateNumber(unknown_state_bit));
 
     char* pstr = cJSON_Print(root);
 

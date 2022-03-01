@@ -150,6 +150,9 @@ void lvgl_gui_user_screen()
     static lv_style_t chart_font_style;
     lv_style_set_text_font(&chart_font_style, LV_STATE_DEFAULT, &lv_font_montserrat_10);
 
+    static lv_style_t img_style;
+    lv_style_init(&img_style);
+
     //创建用户屏幕
     lvgl_gui->user_screen = lv_obj_create(NULL, NULL);
 
@@ -278,7 +281,7 @@ void lvgl_gui_user_screen()
     lvgl_gui->user_tabview_tab3_label_username_value = lv_label_create(lvgl_gui->user_tabview_tab3 , NULL);
     lv_obj_add_style(lvgl_gui->user_tabview_tab3_label_username_value , LV_LABEL_PART_MAIN , &font_16_style);
     lv_label_set_text(lvgl_gui->user_tabview_tab3_label_username_value , soldering_state);
-    lv_obj_set_pos(lvgl_gui->user_tabview_tab3_label_username_value , 50 , 15);
+    lv_obj_set_pos(lvgl_gui->user_tabview_tab3_label_username_value , 10 , 70);
     //     //用户学号
     // lvgl_gui->user_tabview_tab3_label_ID = lv_label_create(lvgl_gui->user_tabview_tab3 , NULL);
     // lv_obj_add_style(lvgl_gui->user_tabview_tab3_label_ID , LV_LABEL_PART_MAIN , &font_16_style);
@@ -287,8 +290,25 @@ void lvgl_gui_user_screen()
     lvgl_gui->user_tabview_tab3_label_ID_value = lv_label_create(lvgl_gui->user_tabview_tab3 , NULL);
     lv_obj_add_style(lvgl_gui->user_tabview_tab3_label_ID_value , LV_LABEL_PART_MAIN , &font_16_style);
     lv_label_set_text(lvgl_gui->user_tabview_tab3_label_ID_value , elecapp_state);
-    lv_obj_set_pos(lvgl_gui->user_tabview_tab3_label_ID_value , 50 , 40);
-    
+    lv_obj_set_pos(lvgl_gui->user_tabview_tab3_label_ID_value , 10 , 90);
+        //设备状态分析图片表示
+    lvgl_gui->user_tabview_tab3_img_solder = lv_img_create(lvgl_gui->user_tabview_tab3 , NULL);
+    lv_img_set_src(lvgl_gui->user_tabview_tab3_img_solder , &solder_off);
+    lv_obj_set_pos(lvgl_gui->user_tabview_tab3_img_solder , 10 , 10);
+
+    lvgl_gui->user_tabview_tab3_img_charger = lv_img_create(lvgl_gui->user_tabview_tab3 , NULL);
+    lv_img_set_src(lvgl_gui->user_tabview_tab3_img_charger , &charger_off);
+    lv_obj_set_pos(lvgl_gui->user_tabview_tab3_img_charger , 70 , 10);
+
+    lvgl_gui->user_tabview_tab3_img_lamp = lv_img_create(lvgl_gui->user_tabview_tab3 , NULL);
+    lv_img_set_src(lvgl_gui->user_tabview_tab3_img_lamp , &lamp_off);
+    lv_obj_set_pos(lvgl_gui->user_tabview_tab3_img_lamp , 130 , 10);
+
+    lvgl_gui->user_tabview_tab3_img_unknown = lv_img_create(lvgl_gui->user_tabview_tab3 , NULL);
+    lv_img_set_src(lvgl_gui->user_tabview_tab3_img_unknown , &unknown);
+    lv_obj_set_pos(lvgl_gui->user_tabview_tab3_img_unknown , 100 , 10); 
+    lv_obj_set_size(lvgl_gui->user_tabview_tab3_img_unknown , 0 , 0);
+
     // //全局通知
     // lvgl_gui->all_label_notice = lv_label_create(lvgl_gui->user_screen , NULL);
     // lv_obj_add_style(lvgl_gui->all_label_notice , LV_LABEL_PART_MAIN , &font_16_style);

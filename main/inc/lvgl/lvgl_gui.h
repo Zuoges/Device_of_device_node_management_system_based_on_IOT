@@ -17,6 +17,15 @@ LV_IMG_DECLARE(V_30);
 LV_IMG_DECLARE(A_30);
 LV_IMG_DECLARE(W_30);
 LV_IMG_DECLARE(headimg_46);
+LV_IMG_DECLARE(charger_on);
+LV_IMG_DECLARE(charger_off);
+LV_IMG_DECLARE(lamp_on);
+LV_IMG_DECLARE(lamp_off);
+LV_IMG_DECLARE(solder_off);
+LV_IMG_DECLARE(solder_up);
+LV_IMG_DECLARE(solder_down);
+LV_IMG_DECLARE(solder_steady);
+LV_IMG_DECLARE(unknown);
 
 extern uint8_t headimg_46_map[4232];
 
@@ -65,6 +74,10 @@ typedef struct
     lv_obj_t *user_tabview_tab3_label_username_value;
     lv_obj_t *user_tabview_tab3_label_ID;
     lv_obj_t *user_tabview_tab3_label_ID_value;
+    lv_obj_t *user_tabview_tab3_img_charger;
+    lv_obj_t *user_tabview_tab3_img_lamp;
+    lv_obj_t *user_tabview_tab3_img_solder;
+    lv_obj_t *user_tabview_tab3_img_unknown;
 }lvgl_gui_t;
 
 lvgl_gui_t *lvgl_gui;

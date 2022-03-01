@@ -57,13 +57,16 @@ void Device_main_task()
         //printf("%.4f, %.4f, %.4f, %.4f, %.4f, \n" , im1281b_data->voltage , im1281b_data->current , im1281b_data->power , im1281b_data->power_factor , im1281b_data->electricity);
 
         status_parse(im1281b_data);
+
+        printf("%.4f, %.4f, %.4f, %.4f, %.4f, %.4f, %d, %d, \n" , im1281b_data->voltage , im1281b_data->current , im1281b_data->power , im1281b_data->power_factor , im1281b_data->electricity , min_d , min_i , soldering_state_bit);
+
         lv_label_set_text(lvgl_gui->user_tabview_tab3_label_username_value , soldering_state);
         lv_label_set_text(lvgl_gui->user_tabview_tab3_label_ID_value , elecapp_state);
         mqtt_count++;
         if(mqtt_count >= 5)
         {
-            Device_MQTT_send();
-            printf("     esp_get_free_heap_size : %d  \n", esp_get_free_heap_size());
+            //Device_MQTT_send();
+            //printf("     esp_get_free_heap_size : %d  \n", esp_get_free_heap_size());
             mqtt_count = 0;
         }
         
@@ -89,4 +92,3 @@ void Device_Event_uninit()
 {
     vTaskDelete(Device_Event_Handle);
 }
-
