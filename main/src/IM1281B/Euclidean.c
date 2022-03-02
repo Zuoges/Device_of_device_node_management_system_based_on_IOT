@@ -109,7 +109,7 @@ void soldering_parse(im1281b_data_t *data)
         //printf("soldering error\r\n");
         //sprintf(soldering_state , "电烙铁错误");
     }
-    
+    Solder_img_set(soldering_state_bit);
     old_p = now_p;
 }
 
@@ -217,7 +217,7 @@ void status_parse(im1281b_data_t *data)
             } 
         }
     }
-    else
+    else if(soldering_state_bit == SOLDERING_down)
     {
         for(i = 0 ; i < ELECAPP_NUM ; i++)
         {
@@ -265,6 +265,26 @@ void status_parse(im1281b_data_t *data)
         if(min_d > PRECISION)
             min_i = ERRORELEC;
         //printf("min_d[%d][%d]= %.4f\n" , min_s , min_i , min_d); 
+    }
+    else if(soldering_state_bit == SOLDERING_no)
+    {
+        for(i = 0 ; i < ELECAPP_NUM ; i++)
+        {
+            //欧几里得度量
+            d[SOLDERING_no][i] = sqrt( (data->current - elecapp[SOLDERING_no][i][CURRENT])*(data->current - elecapp[SOLDERING_no][i][CURRENT]) + (data->power_factor - elecapp[SOLDERING_no][i][POWERFACTOR])*(data->power_factor - elecapp[SOLDERING_no][i][POWERFACTOR]) + (data->power - elecapp[SOLDERING_no][i][APOWER])*(data->power - elecapp[SOLDERING_no][i][APOWER]) );
+        }
+        min_i = 0;
+        min_d = d[SOLDERING_no][min_i];
+        for(i = 0 ; i < ELECAPP_NUM ; i++)
+        {
+            if(d[SOLDERING_no][i] <= min_d)
+            {
+                min_i = i;
+                min_d = d[SOLDERING_no][min_i];
+            }
+        }
+        if(min_d > PRECISION)
+            min_i = ERRORELEC;
     }
     switch(min_i)
     {
@@ -336,13 +356,16 @@ void euclidean_data_init()
     int i , k;
     float AVG[SOLDERING_STATE_NUM][CHARA_NUM] = {0};
 
+    sprintf(soldering_state , "电烙铁关闭");
+    sprintf(elecapp_state , "充电器未使用\n台灯未使用");
+    
     /************************************************/
     elecapp[SOLDERING_no][CHARGER][CURRENT] = 0.122;
-    elecapp[SOLDERING_no][CHARGER][APOWER] = 12.8;
-    elecapp[SOLDERING_no][CHARGER][POWERFACTOR] = 0.452;
+    elecapp[SOLDERING_no][CHARGER][APOWER] = 13.3;
+    elecapp[SOLDERING_no][CHARGER][POWERFACTOR] = 0.466;
 
-    elecapp[SOLDERING_no][LAMP][CURRENT] = 0.086;
-    elecapp[SOLDERING_no][LAMP][APOWER] = 8.5;
+    elecapp[SOLDERING_no][LAMP][CURRENT] = 0.087;
+    elecapp[SOLDERING_no][LAMP][APOWER] = 9.1;
     elecapp[SOLDERING_no][LAMP][POWERFACTOR] = 0.445;
 
     elecapp[SOLDERING_no][LAMP_CHARGER][CURRENT] = 0.177;
@@ -354,8 +377,8 @@ void euclidean_data_init()
     elecapp[SOLDERING_no][NOAPP][POWERFACTOR] = 0.280;
 
     /************************************************/
-    elecapp[SOLDERING_up][CHARGER][CURRENT] = 0.2793;
-    elecapp[SOLDERING_up][CHARGER][APOWER] = 59.8;
+    elecapp[SOLDERING_up][CHARGER][CURRENT] = 0.2993;
+    elecapp[SOLDERING_up][CHARGER][APOWER] = 63.0;
     elecapp[SOLDERING_up][CHARGER][POWERFACTOR] = 0.928;
 
     elecapp[SOLDERING_up][LAMP][CURRENT] = 0.2663;
@@ -373,7 +396,7 @@ void euclidean_data_init()
     /************************************************/
     elecapp[SOLDERING_down][CHARGER][CURRENT] = 0.1415;
     elecapp[SOLDERING_down][CHARGER][APOWER] = 17.2;
-    elecapp[SOLDERING_down][CHARGER][POWERFACTOR] = 0.528;
+    elecapp[SOLDERING_down][CHARGER][POWERFACTOR] = 0.587;
 
     elecapp[SOLDERING_down][LAMP][CURRENT] = 0.1067;
     elecapp[SOLDERING_down][LAMP][APOWER] = 13.2;

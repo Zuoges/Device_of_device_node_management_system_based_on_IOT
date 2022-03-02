@@ -88,7 +88,7 @@ server_receive_data_t server_char_parse( char * json_char)
 void server_data_build(char *TX)
 {
     cJSON * root =  cJSON_CreateObject();
-    //cJSON * item =  cJSON_CreateObject();
+    cJSON * item =  cJSON_CreateObject();
     cJSON * next =  cJSON_CreateObject();
     cJSON_AddItemToObject(root, "uuid", cJSON_CreateNumber(DEV_UUID));
     cJSON_AddItemToObject(root, "local", cJSON_CreateNumber(DEV_LOCAL));
@@ -102,11 +102,11 @@ void server_data_build(char *TX)
     cJSON_AddItemToObject(root, "aelectricity", cJSON_CreateNumber(im1281b_data->electricity));
     cJSON_AddItemToObject(root, "powerfactor", cJSON_CreateNumber(im1281b_data->power_factor));
     //cJSON_AddItemToObject(root, "analysis", cJSON_CreateString(elecapp_state));
-    cJSON_AddItemToObject(root, "analysis", next);
-    cJSON_AddItemToObject(next, "charger", cJSON_CreateNumber(charger_state_bit));
-    cJSON_AddItemToObject(next, "lamp", cJSON_CreateNumber(lamp_state_bit));
-    cJSON_AddItemToObject(next, "soldering", cJSON_CreateNumber(soldering_state_bit));
-    cJSON_AddItemToObject(next, "unknown", cJSON_CreateNumber(unknown_state_bit));
+    cJSON_AddItemToObject(root, "analysis", item);
+    cJSON_AddItemToObject(item, "charger", cJSON_CreateNumber((double)charger_state_bit));
+    cJSON_AddItemToObject(item, "lamp", cJSON_CreateNumber((double)lamp_state_bit));
+    cJSON_AddItemToObject(item, "soldering", cJSON_CreateNumber((double)soldering_state_bit));
+    cJSON_AddItemToObject(item, "unknown", cJSON_CreateNumber((double)unknown_state_bit));
 
     char* pstr = cJSON_Print(root);
 
