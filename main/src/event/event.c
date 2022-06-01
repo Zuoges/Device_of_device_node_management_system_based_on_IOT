@@ -62,6 +62,7 @@ void Device_main_task()
 
         lv_label_set_text(lvgl_gui->user_tabview_tab3_label_username_value , soldering_state);
         lv_label_set_text(lvgl_gui->user_tabview_tab3_label_ID_value , elecapp_state);
+#ifdef USE_NETWORK
         mqtt_count++;
         if(mqtt_count >= 5)
         {
@@ -69,7 +70,7 @@ void Device_main_task()
             //printf("     esp_get_free_heap_size : %d  \n", esp_get_free_heap_size());
             mqtt_count = 0;
         }
-        
+#endif
 
         //lv_label_set_text(lvgl_gui->user_tabview_tab3_label_username_value , http_rec.state_user);
         vTaskDelay(200 / portTICK_PERIOD_MS);

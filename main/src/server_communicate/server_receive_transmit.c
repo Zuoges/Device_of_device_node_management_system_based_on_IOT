@@ -112,7 +112,7 @@ void server_data_build(char *TX)
 
     sprintf(TX, "%s", pstr);
     free(pstr);
-    printf("package ok \r\n");
+    //printf("package ok \r\n");
     // if(next)
     //     cJSON_Delete(next);
     if(root)
