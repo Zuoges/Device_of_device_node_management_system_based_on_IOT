@@ -12,16 +12,19 @@
 #include "Device_Info.h"
 #include "mqtt.h"
 #include "event.h"
+#include "lvgl_gui.h"
 #include "ntp.h"
 #include "wifi.h"
 
 static const char *TAG = "esp32_wifi";
 
+void wifi_icon_display(int32_t state);
+int32_t wifi_state = WIFI_EVENT_STA_DISCONNECTED;
 //设置ssid和password
-static wifi_config_t wifi_config = {
+wifi_config_t wifi_config = {
         .sta = {
-            .ssid = WIFI_SSID,
-            .password = WIFI_PASSWD,
+            .ssid = "",
+            .password = "",
             .scan_method = WIFI_ALL_CHANNEL_SCAN,
             .sort_method = WIFI_CONNECT_AP_BY_SIGNAL,
             .threshold.authmode = WIFI_AUTH_WPA2_PSK
@@ -38,12 +41,15 @@ esp_err_t wifi_event_handler(void* arg, esp_event_base_t event_base,int32_t even
         {
             case WIFI_EVENT_STA_START:
                 ESP_LOGI(TAG, "SYSTEM_EVENT_STA_START");
-                esp_wifi_connect();
-            // ESP_ERROR_CHECK(esp_wifi_connect());
+                wifi_state = WIFI_EVENT_STA_START;
+                wifi_icon_display(event_id);
+                // esp_wifi_connect();
                 break;
             //case IP_EVENT_STA_GOT_IP:
             case WIFI_EVENT_STA_CONNECTED:
                 ESP_LOGI(TAG, "SYSTEM_EVENT_STA_GOT_IP");
+                wifi_state = WIFI_EVENT_STA_CONNECTED;
+                wifi_icon_display(event_id);
                 retry_num = 0;  
                 wifi_connected_bit = 1;
                 /* ESP_LOGI(TAG, "Got IP: %s\n",
@@ -51,14 +57,16 @@ esp_err_t wifi_event_handler(void* arg, esp_event_base_t event_base,int32_t even
                 ip_event_got_ip_t* event = (ip_event_got_ip_t*) event_data; /* 获取IP地址信息*/
                 ESP_LOGI(TAG,"got ip:%d.%d.%d.%d" , IP2STR(&event->ip_info.ip));  /* 打印ip地址*/
                 ntp_init();
-                mqtt_init();
+                //mqtt_init();
                 Device_Event_init();
                 break;
             case WIFI_EVENT_STA_DISCONNECTED:
                 ESP_LOGI(TAG, "SYSTEM_EVENT_STA_DISCONNECTED");
+                wifi_state = WIFI_EVENT_STA_DISCONNECTED;
+                wifi_icon_display(event_id);
                 if(wifi_connected_bit == 1)
                 {
-                    mqtt_uinit();
+                    mqtt_uninit();
                     Device_Event_uninit();
                     printf("wifi disconnect , all task uninit\n");
                 }
@@ -72,6 +80,8 @@ esp_err_t wifi_event_handler(void* arg, esp_event_base_t event_base,int32_t even
                 
                 break;
             default:
+                wifi_state = WIFI_EVENT_STA_DISCONNECTED;
+                wifi_icon_display(event_id);
                 break;
         }
     }
@@ -137,7 +147,39 @@ void wifi_init()
     ESP_ERROR_CHECK(esp_wifi_set_storage(WIFI_STORAGE_RAM));// Set the WiFi API configuration storage type
     ESP_ERROR_CHECK(esp_wifi_set_config(ESP_IF_WIFI_STA, &wifi_config));
     ESP_ERROR_CHECK(esp_wifi_start());
-    ESP_ERROR_CHECK(esp_wifi_connect());
+    //ESP_ERROR_CHECK(esp_wifi_connect());
 
     //xTaskCreate(&wifi_task, "wifi_task", 2048, NULL, 15, NULL);//创建任务
+}
+
+void wifi_icon_display(int32_t state)
+{
+    if(state == WIFI_EVENT_STA_CONNECTED)
+    {
+        if(screen == USER_SCREEN)
+        {
+            lv_imgbtn_set_src(lvgl_gui->user_imgbtn_wifi, LV_BTN_STATE_RELEASED, &icon_wifi_32);
+            lv_imgbtn_set_src(lvgl_gui->user_imgbtn_wifi, LV_BTN_STATE_PRESSED, &icon_wifi_32);
+            lv_imgbtn_set_src(lvgl_gui->user_imgbtn_wifi, LV_BTN_STATE_CHECKED_RELEASED, &icon_wifi_32);
+            lv_imgbtn_set_src(lvgl_gui->user_imgbtn_wifi, LV_BTN_STATE_CHECKED_PRESSED, &icon_wifi_32);
+        }
+        else if(screen == SETUP_SCREEN)
+        {
+            lv_img_set_src(lvgl_gui->setup_img_wifi, &icon_wifi_32);
+        }
+    }
+    else
+    {
+        if(screen == USER_SCREEN)
+        {
+            lv_imgbtn_set_src(lvgl_gui->user_imgbtn_wifi, LV_BTN_STATE_RELEASED, &icon_nowifi_32);
+            lv_imgbtn_set_src(lvgl_gui->user_imgbtn_wifi, LV_BTN_STATE_PRESSED, &icon_nowifi_32);
+            lv_imgbtn_set_src(lvgl_gui->user_imgbtn_wifi, LV_BTN_STATE_CHECKED_RELEASED, &icon_nowifi_32);
+            lv_imgbtn_set_src(lvgl_gui->user_imgbtn_wifi, LV_BTN_STATE_CHECKED_PRESSED, &icon_nowifi_32);
+        }
+        else if(screen == SETUP_SCREEN)
+        {
+            lv_img_set_src(lvgl_gui->setup_img_wifi, &icon_nowifi_32);
+        }
+    }
 }

@@ -5,12 +5,8 @@
 //#define UNUSE_NETWORK
 
 #define LAB_DEVICE_ID "device_02"
-// #define WIFI_SSID    "SteamTicket"
-// #define WIFI_PASSWD  "11113355"
 #define WIFI_SSID    "HUAWEI-JQV4BC"
 #define WIFI_PASSWD  "422wifi."
-// #define WIFI_SSID    "Bugeilianwifi"
-// #define WIFI_PASSWD  "ccxfamily"
 #define WIFI_HOST_NAME "LabMSver1_0_ID_415_02"
 #define DEV_UUID 2
 #define DEV_PSW 0

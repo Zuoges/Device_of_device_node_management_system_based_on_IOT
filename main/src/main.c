@@ -19,6 +19,6 @@ void app_main(void)
     wifi_init();   
 #endif
     lvgl_init();
-    Device_Event_init();
+    //Device_Event_init();
     
 }

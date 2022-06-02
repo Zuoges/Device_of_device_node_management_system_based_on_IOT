@@ -46,22 +46,27 @@ void Device_main_task()
         sprintf(label_volt_str , "%.2fV" , im1281b_data->voltage);
         sprintf(label_curr_str , "%.2fA" , im1281b_data->current);
         sprintf(label_power_str , "%.1fW" , im1281b_data->power);
-        lv_label_set_text(lvgl_gui->user_tabview_tab2_label_volt_num , label_volt_str);
-        lv_label_set_text(lvgl_gui->user_tabview_tab2_label_curr_num , label_curr_str);
-        lv_label_set_text(lvgl_gui->user_tabview_tab2_label_power_num , label_power_str);
-        lv_chart_set_next(lvgl_gui->user_tabview_tab2_chart_volt , lvgl_gui->user_tabview_tab2_chart_series_volt , im1281b_data->voltage);
-        lv_chart_set_next(lvgl_gui->user_tabview_tab2_chart_curr , lvgl_gui->user_tabview_tab2_chart_series_curr , im1281b_data->current);
-        lv_chart_set_next(lvgl_gui->user_tabview_tab2_chart_power , lvgl_gui->user_tabview_tab2_chart_series_power , im1281b_data->power);
-        
-        // printf("U: %.4f\nI: %.4f\nP: %.4f\nPF: %.4f\nE: %.4f\n\n" , im1281b_data->voltage , im1281b_data->current , im1281b_data->power , im1281b_data->power_factor , im1281b_data->electricity);
-        //printf("%.4f, %.4f, %.4f, %.4f, %.4f, \n" , im1281b_data->voltage , im1281b_data->current , im1281b_data->power , im1281b_data->power_factor , im1281b_data->electricity);
+        if(screen == USER_SCREEN)
+        {       
+            screen_flush = 1;
+            lv_label_set_text(lvgl_gui->user_tabview_tab2_label_volt_num , label_volt_str);
+            lv_label_set_text(lvgl_gui->user_tabview_tab2_label_curr_num , label_curr_str);
+            lv_label_set_text(lvgl_gui->user_tabview_tab2_label_power_num , label_power_str);
+            lv_chart_set_next(lvgl_gui->user_tabview_tab2_chart_volt , lvgl_gui->user_tabview_tab2_chart_series_volt , im1281b_data->voltage);
+            lv_chart_set_next(lvgl_gui->user_tabview_tab2_chart_curr , lvgl_gui->user_tabview_tab2_chart_series_curr , im1281b_data->current);
+            lv_chart_set_next(lvgl_gui->user_tabview_tab2_chart_power , lvgl_gui->user_tabview_tab2_chart_series_power , im1281b_data->power);
+            
+            // printf("U: %.4f\nI: %.4f\nP: %.4f\nPF: %.4f\nE: %.4f\n\n" , im1281b_data->voltage , im1281b_data->current , im1281b_data->power , im1281b_data->power_factor , im1281b_data->electricity);
+            //printf("%.4f, %.4f, %.4f, %.4f, %.4f, \n" , im1281b_data->voltage , im1281b_data->current , im1281b_data->power , im1281b_data->power_factor , im1281b_data->electricity);
 
-        status_parse(im1281b_data);
+            status_parse(im1281b_data);
 
-        //printf("%.4f, %.4f, %.4f, %.4f, %.4f, %.4f, %d, %d, \n" , im1281b_data->voltage , im1281b_data->current , im1281b_data->power , im1281b_data->power_factor , im1281b_data->electricity , min_d , min_i , soldering_state_bit);
+            //printf("%.4f, %.4f, %.4f, %.4f, %.4f, %.4f, %d, %d, \n" , im1281b_data->voltage , im1281b_data->current , im1281b_data->power , im1281b_data->power_factor , im1281b_data->electricity , min_d , min_i , soldering_state_bit);
 
-        lv_label_set_text(lvgl_gui->user_tabview_tab3_label_username_value , soldering_state);
-        lv_label_set_text(lvgl_gui->user_tabview_tab3_label_ID_value , elecapp_state);
+            lv_label_set_text(lvgl_gui->user_tabview_tab3_label_username_value , soldering_state);
+            lv_label_set_text(lvgl_gui->user_tabview_tab3_label_ID_value , elecapp_state);
+            screen_flush = 0;
+        }
 #ifdef USE_NETWORK
         mqtt_count++;
         if(mqtt_count >= 5)

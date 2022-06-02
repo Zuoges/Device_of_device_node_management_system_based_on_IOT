@@ -20,15 +20,18 @@
 #define CONNECTED_BIT BIT0
 #define FAIL_BIT      BIT1
 
+extern esp_mqtt_client_config_t mqtt_cfg;
 extern unsigned char MQTT_REC_BIT;
+extern int32_t mqtt_state;
 
 void mqtt_subscribe(char *my_mqtt_topic);
 void mqtt_unsubscribe(char *my_mqtt_topic);
 void mqtt_send_message(char *my_mqtt_topic , char *my_mqtt_data , int message_qos);
 esp_err_t mqtt_event_handler(esp_mqtt_event_handle_t event);
 void mqtt_app_start();
-void mqtt_init();
-void mqtt_uinit();
+//void mqtt_init();
+void mqtt_init(char* server, int serverport);
+void mqtt_uninit();
 
 
 #endif /* _MQTT_H_ */

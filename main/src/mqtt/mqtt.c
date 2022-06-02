@@ -27,8 +27,10 @@ char mqtt_receive_data[200] = {'\0'};
 char mqtt_json_receive_data[200] = {'\0'}; 
 
 unsigned char MQTT_REC_BIT = 0;
+int32_t mqtt_state = MQTT_EVENT_DISCONNECTED;
 
 
+void mqtt_icon_display(int32_t state);
 
 void mqtt_subscribe(char *my_mqtt_topic)        //MQTT订阅主题
 {
@@ -59,12 +61,16 @@ esp_err_t mqtt_event_handler(esp_mqtt_event_handle_t event)
     switch (event->event_id) {
         case MQTT_EVENT_CONNECTED://MQTT连上事件
             ESP_LOGI(TAG, "MQTT_EVENT_CONNECTED");
+            mqtt_state = MQTT_EVENT_CONNECTED;
+            mqtt_icon_display(event->event_id);
             xEventGroupSetBits(mqtt_event_group, CONNECTED_BIT);
             //发送订阅
             //mqtt_subscribe("testesp32mqtt");
             break;
         case MQTT_EVENT_DISCONNECTED://MQTT断开连接事件
             ESP_LOGI(TAG, "MQTT_EVENT_DISCONNECTED");
+            mqtt_state = MQTT_EVENT_DISCONNECTED;
+            mqtt_icon_display(event->event_id);
             //mqtt连上事件
             xEventGroupClearBits(mqtt_event_group, CONNECTED_BIT);
             break;
@@ -97,6 +103,7 @@ esp_err_t mqtt_event_handler(esp_mqtt_event_handle_t event)
             break;
         case MQTT_EVENT_ERROR://MQTT错误事件
             ESP_LOGI(TAG, "MQTT_EVENT_ERROR");
+            mqtt_state = MQTT_EVENT_ERROR;
             xEventGroupClearBits(mqtt_event_group, CONNECTED_BIT);
             break;
         default:break;
@@ -104,13 +111,13 @@ esp_err_t mqtt_event_handler(esp_mqtt_event_handle_t event)
     return ESP_OK;
 }
 
-void mqtt_app_start()
+void mqtt_app_start(char* server, int serverport)
 {
     mqtt_event_group = xEventGroupCreate();
     esp_mqtt_client_config_t mqtt_cfg = {
-        .host = MQTT_SERVER_IP,            //MQTT服务器IP
+        .host = server,            //MQTT服务器IP
         .event_handle = mqtt_event_handler, //MQTT事件
-        .port=MQTT_SERVER_PORT,                         //端口
+        .port = serverport,                         //端口
         .username = MQTT_USER_NAME,                //用户名
         .password = MQTT_PASSWORD,               //密码
         .client_id = MQTT_ID,
@@ -127,14 +134,48 @@ void mqtt_app_start()
     xEventGroupWaitBits(mqtt_event_group, CONNECTED_BIT, false, true, portMAX_DELAY);
 }
 
-void mqtt_init()
+void mqtt_init(char* server, int serverport)
 {
-    mqtt_app_start();
+    mqtt_app_start(server, serverport);
     mqtt_subscribe(MQTT_RECEIVE_ADDRESS);
     mqtt_subscribe(MQTT_PUBLISH_ADDRESS);
+    //mqtt_cfg = (esp_mqtt_client_config_t*)malloc(sizeof(esp_mqtt_client_config_t));
 }
 
-void mqtt_uinit()
+// void mqtt_init()
+// {
+//     mqtt_app_start();
+//     mqtt_subscribe(MQTT_RECEIVE_ADDRESS);
+//     mqtt_subscribe(MQTT_PUBLISH_ADDRESS);
+// }
+
+void mqtt_uninit()
 {
     esp_mqtt_client_stop(client);
+}
+
+void mqtt_icon_display(int32_t state)
+{
+    if(state == MQTT_EVENT_CONNECTED)
+    {
+        if(screen == USER_SCREEN)
+        {
+            lv_img_set_src(lvgl_gui->user_img_mqtt, &icon_mqtt_32);
+        }
+        else if(screen == SETUP_SCREEN)
+        {
+            lv_img_set_src(lvgl_gui->setup_img_mqtt, &icon_mqtt_32);
+        }
+    }
+    else if(state == MQTT_EVENT_DISCONNECTED || state == MQTT_EVENT_ERROR)
+    {
+        if(screen == USER_SCREEN)
+        {
+            lv_img_set_src(lvgl_gui->user_img_mqtt, &icon_nomqtt_32);
+        }
+        else if(screen == SETUP_SCREEN)
+        {
+            lv_img_set_src(lvgl_gui->setup_img_mqtt, &icon_nomqtt_32);
+        }
+    }
 }

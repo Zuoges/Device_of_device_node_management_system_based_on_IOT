@@ -3,16 +3,20 @@
 #include <string.h>
 #include "lvgl.h"
 
+#include "wifi.h"
+#include "mqtt.h"
 #include "Euclidean.h"
 #include "server_receive_transmit.h"
 #include "Device_Info.h"
 #include "lvgl_gui.h"
 
-unsigned char srceen = 0;
+unsigned char screen = LOGIN_SCREEN;
+unsigned char screen_flush = 0;
+char msgbox_str[300];
 
 void lvgl_gui_login_screen()
 {
-    srceen = 0;
+    screen = LOGIN_SCREEN;
     //字体风格
     static lv_style_t font_16_style;
     lv_style_set_text_font(&font_16_style, LV_STATE_DEFAULT, &yumo_16);
@@ -317,9 +321,215 @@ void lvgl_gui_user_screen()
     // lv_label_set_text(lvgl_gui->all_label_notice , "食堂三楼营养猪肚鸡超级好吃                              ");
     // lv_obj_align(lvgl_gui->all_label_notice , NULL , LV_ALIGN_IN_BOTTOM_MID , 0 , 0);
 
+    //全局状态图标
+    lvgl_gui->user_imgbtn_wifi = lv_imgbtn_create(lvgl_gui->user_screen , NULL);
+    if(wifi_state == WIFI_EVENT_STA_CONNECTED)
+    {
+        lv_imgbtn_set_src(lvgl_gui->user_imgbtn_wifi, LV_BTN_STATE_RELEASED, &icon_wifi_32);
+        lv_imgbtn_set_src(lvgl_gui->user_imgbtn_wifi, LV_BTN_STATE_PRESSED, &icon_wifi_32);
+        lv_imgbtn_set_src(lvgl_gui->user_imgbtn_wifi, LV_BTN_STATE_CHECKED_RELEASED, &icon_wifi_32);
+        lv_imgbtn_set_src(lvgl_gui->user_imgbtn_wifi, LV_BTN_STATE_CHECKED_PRESSED, &icon_wifi_32);
+    }
+    else
+    {
+        lv_imgbtn_set_src(lvgl_gui->user_imgbtn_wifi, LV_BTN_STATE_RELEASED, &icon_nowifi_32);
+        lv_imgbtn_set_src(lvgl_gui->user_imgbtn_wifi, LV_BTN_STATE_PRESSED, &icon_nowifi_32);
+        lv_imgbtn_set_src(lvgl_gui->user_imgbtn_wifi, LV_BTN_STATE_CHECKED_RELEASED, &icon_nowifi_32);
+        lv_imgbtn_set_src(lvgl_gui->user_imgbtn_wifi, LV_BTN_STATE_CHECKED_PRESSED, &icon_nowifi_32);
+    }
+    lv_obj_align(lvgl_gui->user_imgbtn_wifi , NULL , LV_ALIGN_IN_BOTTOM_RIGHT , -10 , 0);
+
+    lvgl_gui->user_img_mqtt = lv_img_create(lvgl_gui->user_screen , NULL);
+    if(mqtt_state == MQTT_EVENT_CONNECTED)
+    {
+        lv_img_set_src(lvgl_gui->user_img_mqtt, &icon_mqtt_32);
+    }
+    else if(mqtt_state == MQTT_EVENT_DISCONNECTED || mqtt_state == MQTT_EVENT_ERROR)
+    {
+        lv_img_set_src(lvgl_gui->user_img_mqtt, &icon_nomqtt_32);
+    }
+    lv_obj_align(lvgl_gui->user_img_mqtt , NULL , LV_ALIGN_IN_BOTTOM_RIGHT , -52 , 0);
+
+    lvgl_gui->user_imgbtn_notice = lv_imgbtn_create(lvgl_gui->user_screen , NULL);
+    lv_imgbtn_set_src(lvgl_gui->user_imgbtn_notice, LV_BTN_STATE_RELEASED, &icon_notice_32);
+    lv_imgbtn_set_src(lvgl_gui->user_imgbtn_notice, LV_BTN_STATE_PRESSED, &icon_notice_32);
+    lv_imgbtn_set_src(lvgl_gui->user_imgbtn_notice, LV_BTN_STATE_CHECKED_RELEASED, &icon_notice_32);
+    lv_imgbtn_set_src(lvgl_gui->user_imgbtn_notice, LV_BTN_STATE_CHECKED_PRESSED, &icon_notice_32);
+    lv_obj_align(lvgl_gui->user_imgbtn_notice , NULL , LV_ALIGN_IN_BOTTOM_RIGHT , -94 , 0);
 
     user_screen_events_init();
-    srceen = 1;
+
+    screen = USER_SCREEN;
+}
+
+void lvgl_gui_user_msgbox_notice()
+{
+    //字体风格
+    static lv_style_t font_16_style;
+    lv_style_set_text_font(&font_16_style, LV_STATE_DEFAULT, &yumo_16);
+    
+    static const char* btn_str[] = { "关闭", "" };
+    lvgl_gui->user_msgbox_notice = lv_msgbox_create(lv_scr_act(), NULL);
+    lv_obj_add_style(lvgl_gui->user_msgbox_notice, LV_LABEL_PART_MAIN , &font_16_style);
+    sprintf(msgbox_str, "这里是浙理工科艺学院\n2018级电子信息工程1班\n陈豪佐 的本科毕设作品\n基于物联网的设备节点管理系统设备端\n点击WIFI图标可以配置网络\nWIFI : %s\nMQTT服务器 : %s", (char*)wifi_config.sta.ssid, mqttserver);
+    lv_msgbox_set_text(lvgl_gui->user_msgbox_notice, msgbox_str);
+    lv_msgbox_add_btns(lvgl_gui->user_msgbox_notice, btn_str);
+    lv_obj_align(lvgl_gui->user_msgbox_notice, NULL, LV_ALIGN_CENTER, 0, 0);
+
+}
+
+void lvgl_gui_setup_screen()
+{
+    screen = SETUP_SCREEN;
+    lvgl_gui->setup_kb = NULL;
+    
+    //字体风格
+    static lv_style_t font_16_style;
+    lv_style_set_text_font(&font_16_style, LV_STATE_DEFAULT, &yumo_16);
+
+    static lv_style_t lv_font_20_style;
+    lv_style_set_text_font(&lv_font_20_style, LV_STATE_DEFAULT, &lv_font_montserrat_20);
+
+    static lv_style_t font_24_style;
+    lv_style_set_text_font(&font_24_style, LV_STATE_DEFAULT, &ziyuanyuanti_24);
+
+    static lv_style_t lv_font_24_style;
+    lv_style_set_text_font(&lv_font_24_style, LV_STATE_DEFAULT, &lv_font_montserrat_24);
+
+    static lv_style_t img_style;
+    lv_style_init(&img_style);
+
+    //创建设置屏幕
+    lvgl_gui->setup_screen = lv_obj_create(NULL, NULL);
+
+    //设置页面
+    lvgl_gui->setup_page = lv_page_create(lvgl_gui->setup_screen, NULL);
+    lv_obj_set_size(lvgl_gui->setup_page, 320, 240);
+    lv_obj_align(lvgl_gui->setup_page, NULL, LV_ALIGN_CENTER, 0, 0);
+    // lv_page_set_edge_flash(lvgl_gui->setup_page, true);
+
+    //创建WIFI设置文字框
+    lvgl_gui->setup_label_wifissid = lv_label_create(lvgl_gui->setup_page, NULL);
+    lv_obj_add_style(lvgl_gui->setup_label_wifissid, LV_LABEL_PART_MAIN , &font_16_style);
+    lv_label_set_text(lvgl_gui->setup_label_wifissid , "WIFI名称:");
+    lv_obj_set_pos(lvgl_gui->setup_label_wifissid , 10 , 10);
+
+    lvgl_gui->setup_text_wifissid = lv_textarea_create(lvgl_gui->setup_page, NULL);
+    lv_obj_add_style(lvgl_gui->setup_text_wifissid, LV_LABEL_PART_MAIN , &font_16_style);
+    lv_textarea_set_text(lvgl_gui->setup_text_wifissid, "SteamTicket");
+    lv_textarea_set_placeholder_text(lvgl_gui->setup_text_wifissid, "WIFI SSID");
+    lv_obj_set_pos(lvgl_gui->setup_text_wifissid, 10, 30);
+    lv_obj_set_size(lvgl_gui->setup_text_wifissid, 200, 40);
+    lv_textarea_set_one_line(lvgl_gui->setup_text_wifissid, true);
+    lv_textarea_set_cursor_hidden(lvgl_gui->setup_text_wifissid, true);
+
+    lvgl_gui->setup_label_wifipsw = lv_label_create(lvgl_gui->setup_page, NULL);
+    lv_obj_add_style(lvgl_gui->setup_label_wifipsw, LV_LABEL_PART_MAIN , &font_16_style);
+    lv_label_set_text(lvgl_gui->setup_label_wifipsw , "WIFI密码:");
+    lv_obj_set_pos(lvgl_gui->setup_label_wifipsw , 10 , 70);
+
+    lvgl_gui->setup_text_wifipsw = lv_textarea_create(lvgl_gui->setup_page, NULL);
+    lv_obj_add_style(lvgl_gui->setup_text_wifipsw, LV_LABEL_PART_MAIN , &font_16_style);
+    lv_textarea_set_text(lvgl_gui->setup_text_wifipsw, "11113355");
+    lv_textarea_set_placeholder_text(lvgl_gui->setup_text_wifipsw, "WIFI Password");
+    lv_textarea_set_pwd_mode(lvgl_gui->setup_text_wifipsw, true);
+    lv_obj_set_pos(lvgl_gui->setup_text_wifipsw, 10, 90);
+    lv_obj_set_size(lvgl_gui->setup_text_wifipsw , 200 , 40);
+    lv_textarea_set_one_line(lvgl_gui->setup_text_wifipsw, true);
+    lv_textarea_set_cursor_hidden(lvgl_gui->setup_text_wifipsw, true);
+
+    lvgl_gui->setup_btn_wifi = lv_btn_create(lvgl_gui->setup_page, NULL);
+    lv_obj_set_size(lvgl_gui->setup_btn_wifi , 100 , 30);
+    lv_obj_set_pos(lvgl_gui->setup_btn_wifi, 10, 130);
+    lvgl_gui->setup_btn_label_wifi = lv_label_create(lvgl_gui->setup_btn_wifi , NULL);
+    lv_obj_add_style(lvgl_gui->setup_btn_label_wifi, LV_LABEL_PART_MAIN , &font_16_style);
+    lv_label_set_text(lvgl_gui->setup_btn_label_wifi , "连接WIFI");
+
+    lvgl_gui->setup_btn_unwifi = lv_btn_create(lvgl_gui->setup_page, NULL);
+    lv_obj_set_size(lvgl_gui->setup_btn_unwifi , 100 , 30);
+    lv_obj_set_pos(lvgl_gui->setup_btn_unwifi, 110, 130);
+    lvgl_gui->setup_btn_label_unwifi = lv_label_create(lvgl_gui->setup_btn_unwifi , NULL);
+    lv_obj_add_style(lvgl_gui->setup_btn_label_unwifi, LV_LABEL_PART_MAIN , &font_16_style);
+    lv_label_set_text(lvgl_gui->setup_btn_label_unwifi , "断开WIFI");
+
+    //创建MQTT设置文字框
+    lvgl_gui->setup_label_mqttserver = lv_label_create(lvgl_gui->setup_page, NULL);
+    lv_obj_add_style(lvgl_gui->setup_label_mqttserver, LV_LABEL_PART_MAIN , &font_16_style);
+    lv_label_set_text(lvgl_gui->setup_label_mqttserver , "MQTT服务器地址:");
+    lv_obj_set_pos(lvgl_gui->setup_label_mqttserver , 10 , 170);
+
+    lvgl_gui->setup_text_mqttserver = lv_textarea_create(lvgl_gui->setup_page, NULL);
+    lv_obj_add_style(lvgl_gui->setup_text_mqttserver, LV_LABEL_PART_MAIN , &font_16_style);
+    lv_textarea_set_text(lvgl_gui->setup_text_mqttserver, "mqtt.emqttedu.xyz");
+    lv_textarea_set_placeholder_text(lvgl_gui->setup_text_mqttserver, "MQTT Server");
+    lv_obj_set_pos(lvgl_gui->setup_text_mqttserver, 10, 190);
+    lv_obj_set_size(lvgl_gui->setup_text_mqttserver , 200 , 30);
+    lv_textarea_set_one_line(lvgl_gui->setup_text_mqttserver, true);
+    lv_textarea_set_cursor_hidden(lvgl_gui->setup_text_mqttserver, true);
+
+    lvgl_gui->setup_label_mqttport = lv_label_create(lvgl_gui->setup_page, NULL);
+    lv_obj_add_style(lvgl_gui->setup_label_mqttport, LV_LABEL_PART_MAIN , &font_16_style);
+    lv_label_set_text(lvgl_gui->setup_label_mqttport , "MQTT端口号:");
+    lv_obj_set_pos(lvgl_gui->setup_label_mqttport , 10 , 230);
+
+    lvgl_gui->setup_text_mqttport = lv_textarea_create(lvgl_gui->setup_page, NULL);
+    lv_obj_add_style(lvgl_gui->setup_text_mqttport, LV_LABEL_PART_MAIN , &font_16_style);
+    lv_textarea_set_text(lvgl_gui->setup_text_mqttport, "1883");
+    lv_textarea_set_placeholder_text(lvgl_gui->setup_text_mqttport, "MQTT Port");
+    lv_textarea_set_accepted_chars(lvgl_gui->setup_text_mqttport, "0123456789");
+    lv_obj_set_pos(lvgl_gui->setup_text_mqttport, 10, 250);
+    lv_obj_set_size(lvgl_gui->setup_text_mqttport , 200 , 30);
+    lv_textarea_set_one_line(lvgl_gui->setup_text_mqttport, true);
+    lv_textarea_set_cursor_hidden(lvgl_gui->setup_text_mqttport, true);
+
+    lvgl_gui->setup_btn_mqtt = lv_btn_create(lvgl_gui->setup_page, NULL);
+    lv_obj_set_size(lvgl_gui->setup_btn_mqtt , 100 , 30);
+    lv_obj_set_pos(lvgl_gui->setup_btn_mqtt, 10, 290);
+    lvgl_gui->setup_btn_label_mqtt = lv_label_create(lvgl_gui->setup_btn_mqtt , NULL);
+    lv_obj_add_style(lvgl_gui->setup_btn_label_mqtt, LV_LABEL_PART_MAIN , &font_16_style);
+    lv_label_set_text(lvgl_gui->setup_btn_label_mqtt , "连接MQTT");
+    
+    lvgl_gui->setup_btn_unmqtt = lv_btn_create(lvgl_gui->setup_page, NULL);
+    lv_obj_set_size(lvgl_gui->setup_btn_unmqtt , 100 , 30);
+    lv_obj_set_pos(lvgl_gui->setup_btn_unmqtt, 110, 290);
+    lvgl_gui->setup_btn_label_unmqtt = lv_label_create(lvgl_gui->setup_btn_unmqtt , NULL);
+    lv_obj_add_style(lvgl_gui->setup_btn_label_unmqtt, LV_LABEL_PART_MAIN , &font_16_style);
+    lv_label_set_text(lvgl_gui->setup_btn_label_unmqtt , "断开MQTT");
+
+    //离开设置界面按键
+    lvgl_gui->setup_btn_exit = lv_btn_create(lvgl_gui->setup_page, NULL);
+    lv_obj_set_size(lvgl_gui->setup_btn_exit , 100 , 30);
+    lv_obj_set_pos(lvgl_gui->setup_btn_exit, 10, 330);
+    lvgl_gui->setup_btn_label_exit = lv_label_create(lvgl_gui->setup_btn_exit , NULL);
+    lv_obj_add_style(lvgl_gui->setup_btn_label_exit, LV_LABEL_PART_MAIN , &font_16_style);
+    lv_label_set_text(lvgl_gui->setup_btn_label_exit , "离开设置");
+
+    //全局状态图标
+    lvgl_gui->setup_img_wifi = lv_img_create(lvgl_gui->setup_screen , NULL);
+
+    if(wifi_state == WIFI_EVENT_STA_CONNECTED)
+    {
+        lv_img_set_src(lvgl_gui->setup_img_wifi, &icon_wifi_32);
+    }
+    else
+    {
+        lv_img_set_src(lvgl_gui->setup_img_wifi, &icon_nowifi_32);
+    }
+    lv_obj_align(lvgl_gui->setup_img_wifi , NULL , LV_ALIGN_IN_BOTTOM_RIGHT , -10 , 0);
+
+    lvgl_gui->setup_img_mqtt = lv_img_create(lvgl_gui->setup_screen , NULL);
+    if(mqtt_state == MQTT_EVENT_CONNECTED)
+    {
+        lv_img_set_src(lvgl_gui->setup_img_mqtt, &icon_mqtt_32);
+    }
+    else if(mqtt_state == MQTT_EVENT_DISCONNECTED || mqtt_state == MQTT_EVENT_ERROR)
+    {
+        lv_img_set_src(lvgl_gui->setup_img_mqtt, &icon_nomqtt_32);
+    }
+    lv_obj_align(lvgl_gui->setup_img_mqtt , NULL , LV_ALIGN_IN_BOTTOM_RIGHT , -52 , 0);
+
+    
+    setup_screen_events_init();
 }
 
 void lvgl_gui_start()
