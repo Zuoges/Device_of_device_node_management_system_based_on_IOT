@@ -34,10 +34,6 @@ void Device_MQTT_send()
 
 void Device_main_task()
 {
-    static int get_img_bit = 0;
-    static int free_bit = 1;
-    static int reservation_bit = 0;
-    static int using_bit = 0;
     static int mqtt_count = 0;
     while(1)
     {
