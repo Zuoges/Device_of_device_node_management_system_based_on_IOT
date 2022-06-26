@@ -416,7 +416,7 @@ void lvgl_gui_setup_screen()
 
     lvgl_gui->setup_text_wifissid = lv_textarea_create(lvgl_gui->setup_page, NULL);
     lv_obj_add_style(lvgl_gui->setup_text_wifissid, LV_LABEL_PART_MAIN , &font_16_style);
-    lv_textarea_set_text(lvgl_gui->setup_text_wifissid, "SteamTicket");
+    lv_textarea_set_text(lvgl_gui->setup_text_wifissid, "HUAWEI-JQV4BC");
     lv_textarea_set_placeholder_text(lvgl_gui->setup_text_wifissid, "WIFI SSID");
     lv_obj_set_pos(lvgl_gui->setup_text_wifissid, 10, 30);
     lv_obj_set_size(lvgl_gui->setup_text_wifissid, 200, 40);
@@ -430,7 +430,7 @@ void lvgl_gui_setup_screen()
 
     lvgl_gui->setup_text_wifipsw = lv_textarea_create(lvgl_gui->setup_page, NULL);
     lv_obj_add_style(lvgl_gui->setup_text_wifipsw, LV_LABEL_PART_MAIN , &font_16_style);
-    lv_textarea_set_text(lvgl_gui->setup_text_wifipsw, "11113355");
+    lv_textarea_set_text(lvgl_gui->setup_text_wifipsw, "422wifi.");
     lv_textarea_set_placeholder_text(lvgl_gui->setup_text_wifipsw, "WIFI Password");
     lv_textarea_set_pwd_mode(lvgl_gui->setup_text_wifipsw, true);
     lv_obj_set_pos(lvgl_gui->setup_text_wifipsw, 10, 90);
@@ -460,7 +460,7 @@ void lvgl_gui_setup_screen()
 
     lvgl_gui->setup_text_mqttserver = lv_textarea_create(lvgl_gui->setup_page, NULL);
     lv_obj_add_style(lvgl_gui->setup_text_mqttserver, LV_LABEL_PART_MAIN , &font_16_style);
-    lv_textarea_set_text(lvgl_gui->setup_text_mqttserver, "mqtt.emqttedu.xyz");
+    lv_textarea_set_text(lvgl_gui->setup_text_mqttserver, "192.168.3.2");
     lv_textarea_set_placeholder_text(lvgl_gui->setup_text_mqttserver, "MQTT Server");
     lv_obj_set_pos(lvgl_gui->setup_text_mqttserver, 10, 190);
     lv_obj_set_size(lvgl_gui->setup_text_mqttserver , 200 , 30);
