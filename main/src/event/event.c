@@ -57,8 +57,8 @@ void Device_main_task()
         //printf("%.4f, %.4f, %.4f, %.4f, %.4f, \n" , im1281b_data->voltage , im1281b_data->current , im1281b_data->power , im1281b_data->power_factor , im1281b_data->electricity);
 
         status_parse(im1281b_data);
-
-        //printf("%.4f, %.4f, %.4f, %.4f, %.4f, %.4f, %d, %d, \n" , im1281b_data->voltage , im1281b_data->current , im1281b_data->power , im1281b_data->power_factor , im1281b_data->electricity , min_d , min_i , soldering_state_bit);
+        //打印顺序分别为 电压,电流,功率,功率因数,电量,(可忽略),(可忽略),电烙铁状态编号(可忽略)
+        printf("%.4f, %.4f, %.4f, %.4f, %.4f, %.4f, %d, %d, \n" , im1281b_data->voltage , im1281b_data->current , im1281b_data->power , im1281b_data->power_factor , im1281b_data->electricity , min_d , min_i , soldering_state_bit);
 
         lv_label_set_text(lvgl_gui->user_tabview_tab3_label_username_value , soldering_state);
         lv_label_set_text(lvgl_gui->user_tabview_tab3_label_ID_value , elecapp_state);
