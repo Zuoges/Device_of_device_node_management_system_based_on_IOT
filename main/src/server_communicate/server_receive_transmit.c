@@ -16,12 +16,9 @@
 /**解析服务器发来的json**/
 server_receive_data_t server_char_parse( char * json_char)
 {   
-    char state_bit[10]; 
-
     server_receive_data_t server_data = {0};
 
     cJSON * root = NULL;
-    cJSON * next = NULL;
     cJSON * item = NULL;
 
     char * index = strchr(json_char , '{');

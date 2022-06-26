@@ -226,8 +226,6 @@ static void setup_btn_mqtt_event_handler(lv_obj_t* obj, lv_event_t event)
 
 static void setup_btn_unmqtt_event_handler(lv_obj_t* obj, lv_event_t event)
 {
-    char ssid[32];
-    char psw[64];
     switch (event)
     {
         case LV_EVENT_CLICKED:
